@@ -1,5 +1,5 @@
 Set & Unset Proxy
-
+=================
 vi /etc/environtment
 
 export https_proxy=http://192.168.xx.xx:8080
@@ -9,3 +9,278 @@ export ftp_proxy=http://192.168.xx.xx:8080
 unset http_proxy	
 unset https_proxy
 unset ftp_proxy   
+
+Delete user from a group
+========================
+gpasswd --delete aidil root
+
+Create Local Repository Centos/RHEL 8
+=====================================
+[svr-BaseOS]
+name=Server Local RHEL 84 BaseOS
+baseurl=http://192.168.xx.xx/RHEL-8.4/BaseOS/
+enabled=1
+gpgcheck=1
+gpgkey=http://192.168.xx.xx/RHEL-8.4/RPM-GPG-KEY-redhat-release
+
+[svr-AppStream]
+name=Server Local RHEL 84 AppStream
+baseurl=http://192.168.xx.xx/RHEL-8.4/AppStream
+enabled=1
+gpgcheck=1
+gpgkey=http://192.168.xx.xx/RHEL-8.4/RPM-GPG-KEY-redhat-release
+
+#===Local Repo Centos 8 Stream===
+=================================
+[svr-base-centos8]
+name=Server Local CentOS 8 Stream BaseOS
+baseurl=file:///media/rhel79/CentOS-8/BaseOS
+enabled=0
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-centosofficial
+
+[svr-extras-centos8]
+name=Server Local CentOS 8 Stream Extras
+baseurl=file:///media/rhel79/CentOS-8/BaseOS
+enabled=0
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-centosofficial
+
+[svr-appstream-centos8]
+name=Server Local CentOS 8 Stream AppStream
+baseurl=file:///media/rhel79/CentOS-8/BaseOS
+enabled=0
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-centosofficial
+
+[svr-BaseOS]
+name=Server Local RHEL 84 BaseOS
+baseurl=file:///mnt/BaseOS
+enabled=1
+gpgcheck=0
+gpgkey=http://192.168.225.220/RHEL-8.4/RPM-GPG-KEY-redhat-release
+
+[svr-AppStream]
+name=Server Local RHEL 84 AppStream
+baseurl=file:///mnt/AppStream
+enabled=1
+gpgcheck=0
+gpgkey=http://192.168.xx.xx/RHEL-8.4/RPM-GPG-KEY-redhat-release
+
+
+Create Local Repository Centos/RHEL 7
+======================================
+[localreporhel79]
+name=Local Repository RHEL 7.9
+baseurl=file:///media/rhel79
+enable=1
+gpgcheck=1
+gpgkey=file://etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+
+[localreporhel79]
+name=Local Repository RHEL 7.9
+baseurl=http://192.168.xx.xx/RHEL-7.8/
+enable=1
+gpgcheck=0
+gpgkey=file://etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+
+Test Koneksi via curl
+======================
+curl -kv pkg.xxx.com:5000
+
+Ping Host Using Date & Time
+============================
+ping www.google.com | while read pong; do echo "$(date): $pong"; done
+
+How to get all pv openshift 
+===========================
+oc get pv | grep 'ldap\|grafana\|redis\|activemq\|elasticsearch1\|elasticsearch2\|prometheuspv'
+
+How to adding Static Route in Centos 7
+======================================
+Method One : Using nmcli command line tool
+Example
+For example, lets add an entry that will route all traffic to the 10.0.0.0/24 network through the gateway of 192.168.1.10. And the name of the connection is enp0s3.
+
+nmcli connection modify "enp0s3" +ipv4.routes "10.0.0.0/24 10.70.128.1"
+nmcli connection reload
+nmcli connection up enp0s3
+
+Do not Forget the + mark before the keyword ipv4.routes (+ipv4.routes). Otherwise, existing entries will be overridden.
+
+Method Two : Manually Create Configuration File
+cd /etc/sysconfig/network-scripts/
+
+create a file following the interface names, syntax "route-connectioname"
+touch route-enp0s3
+
+ADDRESS0=10.0.0.0
+NETMASK0=255.255.255.0
+GATEWAY0=192.168.1.10
+
+ADDRESS1=192.168.50.10
+NETMASK1=255.255.255.255
+GATEWAY1=192.168.1.1
+
+nmcli connection reload
+nmcli connection up enp0s3
+
+
+Extend disk dengan pvresize (studi kasus lv yang ada di /dev/sdb)
+=================================================================
+# ls /sys/class/scsi_device/
+0:0:0:0  0:0:1:0  3:0:0:0
+[root@NEWCOREAPP04 ~]# echo 1 > /sys/class/scsi_device/0\:0\:0\:0/device/rescan
+[root@NEWCOREAPP04 ~]# echo 1 > /sys/class/scsi_device/0\:0\:1\:0/device/rescan
+[root@NEWCOREAPP04 ~]# echo 1 > /sys/class/scsi_device/3\:0\:0\:0/device/rescan
+
+[root@NEWCOREAPP04 ~]# lsblk
+NAME              MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+sdb                 8:16   0  770G  0 disk
+├─data-fnsonlp    253:2    0    2G  0 lvm  /fns/fnsonlp
+├─data-fnsonlpd   253:3    0    2G  0 lvm  /fns/fnsonlpd
+├─data-fnsonlps   253:4    0    2G  0 lvm  /fns/fnsonlps
+├─data-fnstpcd    253:5    0    2G  0 lvm  /fns/fnstpcd
+├─data-ora10g     253:6    0   10G  0 lvm  /home/ora10g
+├─data-fnspr      253:7    0   20G  0 lvm  /fns/p/r
+├─data-fnspdr     253:8    0  400G  0 lvm  /fns/pd/r
+├─data-fnspsr     253:9    0   20G  0 lvm  /fns/ps/r
+├─data-fnspt      253:10   0   40G  0 lvm  /fns/p/t
+├─data-backup     253:11   0  150G  0 lvm  /backup
+├─data-microfocus 253:12   0   10G  0 lvm  /opt/microfocus
+└─data-oracle12c  253:13   0   15G  0 lvm  /oracle12cR2
+sr0                11:0    1 1024M  0 rom   
+
+
+pvresize /dev/sdb
+lvextend -L +18Gb /dev/data/fnsonlp
+lvextend -L +18Gb /dev/data/fnsonlpd
+lvextend -L +18Gb /dev/data/fnsonlps
+lvextend -L +18Gb /dev/data/fnstpcd
+lvextend -L +10Gb /dev/data/ora10g
+lvextend -L +10Gb /dev/data/microfocus
+lvextend -L +5Gb /dev/data/oracle12c
+
+xfs_growfs /dev/data/fnsonlp
+xfs_growfs /dev/data/fnsonlpd
+xfs_growfs /dev/data/fnsonlps
+xfs_growfs /dev/data/fnstpcd
+xfs_growfs /dev/data/ora10g
+xfs_growfs /dev/data/microfocus
+xfs_growfs /dev/data/oracle12c
+
+[root@NEWCOREAPP04 ~]# pvresize /dev/sdb
+  Physical volume "/dev/sdb" changed
+  1 physical volume(s) resized or updated / 0 physical volume(s) not resized
+[root@NEWCOREAPP04 ~]# lvextend -L +18Gb /dev/data/fnsonlp
+  Size of logical volume data/fnsonlp changed from 2.00 GiB (512 extents) to 20.00 GiB (5120 extents).
+  Logical volume data/fnsonlp successfully resized.
+[root@NEWCOREAPP04 ~]# lvextend -L +18Gb /dev/data/fnsonlpd
+  Size of logical volume data/fnsonlpd changed from 2.00 GiB (512 extents) to 20.00 GiB (5120 extents).
+  Logical volume data/fnsonlpd successfully resized.
+[root@NEWCOREAPP04 ~]# lvextend -L +18Gb /dev/data/fnsonlps
+  Size of logical volume data/fnsonlps changed from 2.00 GiB (512 extents) to 20.00 GiB (5120 extents).
+  Logical volume data/fnsonlps successfully resized.
+[root@NEWCOREAPP04 ~]# lvextend -L +18Gb /dev/data/fnstpcd
+  Size of logical volume data/fnstpcd changed from 2.00 GiB (512 extents) to 20.00 GiB (5120 extents).
+  Logical volume data/fnstpcd successfully resized.
+[root@NEWCOREAPP04 ~]# lvextend -L +10Gb /dev/data/ora10g
+  Size of logical volume data/ora10g changed from 10.00 GiB (2560 extents) to 20.00 GiB (5120 extents).
+  Logical volume data/ora10g successfully resized.
+[root@NEWCOREAPP04 ~]# lvextend -L +10Gb /dev/data/microfocus
+  Size of logical volume data/microfocus changed from 10.00 GiB (2560 extents) to 20.00 GiB (5120 extents).
+  Logical volume data/microfocus successfully resized.
+[root@NEWCOREAPP04 ~]# lvextend -L +5Gb /dev/data/oracle12c
+  Size of logical volume data/oracle12c changed from <15.00 GiB (3839 extents) to <20.00 GiB (5119 extents).
+  Logical volume data/oracle12c successfully resized.
+[root@NEWCOREAPP04 ~]# xfs_growfs /dev/data/fnsonlp
+
+How to Check status crontab on centos7
+======================================
+sudo systemctl enable crond.service
+sudo systemctl start crond.service
+systemctl status crond.service
+
+tail -f /var/log/messages
+pgrep cron
+crontab -l
+
+Reset passsword expired account linux
+======================================
+passwd -e oracle
+
+Ubuntu after install cannot to ssh
+==================================
+Error Message "Could not load host key: /etc/ssh/ssh_host_rsa_key
+
+> Solved
+/usr/bin/ssh-keygen -A
+
+Install Module PDF::Create on Centos 7
+=======================================
+yum install perl-CPAN
+perl -MCPAN -e 'install PDF::Create' 
+cpan[4]> install PDF::Create 
+cpan[5]> install Test::LeakTrace
+perl -MCPAN -e 'install PDF::Create'
+[root@lab /]# find / -name MANWAR
+/root/.cpan/sources/authors/id/M/MA/MANWAR
+cd /root/.cpan/sources/authors/id/M/MA/MANWAR
+cp PDF-Create-1.46.tar.gz /tmp/
+cd /tmp/
+tar -zxvf PDF-Create-1.46.tar.gz 
+[root@lab PDF-Create-1.46]# less README 
+perl Makefile.PL 
+make
+make install
+[root@lab PDF-Create-1.46]# instmodsh
+Available commands are:
+   l            - List all installed modules
+   m <module>   - Select a module
+cmd? l
+Installed modules are:
+   Class::Inspector
+   ExtUtils::Config
+   ExtUtils::Helpers
+   ExtUtils::InstallPaths
+   File::Share
+   File::ShareDir
+   File::ShareDir::Install
+   JSON
+   Math::BigInt
+   Module::Build::Tiny
+   PDF::Create
+   Perl
+   Readonly
+   Test::Harness
+   Test::Simple
+   
+Find And Replace Using Vim  > https://linuxize.com/post/vim-find-replace/
+=========================================================================
+:%s/192.168.118.254/192.168.97.254/g
+
+Enter to POD in kubernetes
+===========================
+oc exec -it businessnext-app-5bd76ff4cc-7l2qk -- /bin/bash
+
+Install OpenJDK versi 11 di rhel 8
+===================================
+yum install java-11-openjdk.x86_64
+
+> Kemudian Hapus java versi lama di server tersebut
+yum remove java-1.8.0-openjdk.x86_64
+yum remove java-1.8.0*
+
+java -version
+openjdk version "11.0.10" 2021-01-19 LTS
+OpenJDK Runtime Environment 18.9 (build 11.0.10+9-LTS)
+OpenJDK 64-Bit Server VM 18.9 (build 11.0.10+9-LTS, mixed mode, sharing)
+
+Check Proses Yang Menggunakan Memory
+====================================
+ps aux  | awk '{print $6/1024 " MB\t\t" $11}'  | sort -n 
+ps -eo pid,user,%mem,cmd --sort=-%mem
+ps -eo pid,user,%mem,cmd --sort=-%mem | head -n 10 | awk '{print $1, $2, $3, $4}'
+ps -eo pid,user,%mem,cmd --sort=-%mem | head -n 10 | awk '{print $1, " ", $2, " ", $3, " ", $4}' 
+ps -eo pid,user,%mem,size,cmd --sort=-%mem | head -n 10 | awk '{print $1, " ", $2, " ", $3, " ", $4}'
+
